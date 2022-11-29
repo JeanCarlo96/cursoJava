@@ -1,5 +1,12 @@
-/.idea/
-*.xml
-*.iws
-*.ipr
+**/nbproject/private/
+**/nbproject/Makefile-*.mk
+**/nbproject/Package-*.bash
+**/.idea/
+**/.settings/
+**/target/
 *.iml
+**/bin/
+*.classpath
+*.class
+*.jar
+*.lst
