@@ -1,12 +1,46 @@
+# Ignorar archivos de configuración de NetBeans
 **/nbproject/private/
 **/nbproject/Makefile-*.mk
 **/nbproject/Package-*.bash
+
+# Ignorar archivos de configuración de IntelliJ IDEA
 **/.idea/
 **/.settings/
-**/target/
 *.iml
+
+# Ignorar directorios de compilación
+**/target/
 **/bin/
-*.classpath
+
+# Ignorar archivos generados por el compilador
 *.class
 *.jar
 *.lst
+
+# Ignorar archivos de dependencias
+*.log
+*.tmp
+*.swp
+*.swo
+
+# Ignorar archivos de paquetes de Maven
+**/pom.xml.tag
+**/pom.xml.releaseBackup
+**/pom.xml.versionsBackup
+
+# Ignorar archivos de configuración de gradle
+**/gradle-app.setting
+**/gradle/wrapper/gradle-wrapper.jar
+**/gradle/wrapper/gradle-wrapper.properties
+
+# Ignorar archivos de salida de pruebas
+**/test-output/
+**/surefire-reports/
+
+# Ignorar archivos de cache de compiladores
+**/.gradle/
+**/.m2/
+
+# Ignorar archivos de sistema
+.DS_Store
+Thumbs.db
