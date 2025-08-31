@@ -1,8 +1,17 @@
 package com.jcma.springboot.reuniones.models;
 
+import jakarta.persistence.*;
+
+@Entity
+@Table(name = "persona")
 public class Persona {
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long id;
     private String nombre;
+
+    @Column(name = "apellidos")
     private String apellido;
 
     public Persona(){
@@ -39,4 +48,12 @@ public class Persona {
         this.apellido = apellido;
     }
 
+    @Override
+    public String toString() {
+        return "Persona{" +
+                "id=" + id +
+                ", nombre='" + nombre + '\'' +
+                ", apellido='" + apellido + '\'' +
+                '}';
+    }
 }
