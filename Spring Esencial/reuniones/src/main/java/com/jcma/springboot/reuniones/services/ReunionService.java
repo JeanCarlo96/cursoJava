@@ -1,13 +1,11 @@
 package com.jcma.springboot.reuniones.services;
 
 import com.jcma.springboot.reuniones.data.IReunionRepository;
-import com.jcma.springboot.reuniones.models.Persona;
 import com.jcma.springboot.reuniones.models.Reunion;
 import org.springframework.stereotype.Service;
 
-import java.time.ZonedDateTime;
-import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class ReunionService {
@@ -20,6 +18,10 @@ public class ReunionService {
 
     public List<Reunion> getAllReuniones(){
         return iReunionRepository.findAll();
+    }
+
+    public Optional<Reunion> getById(Long id){
+        return iReunionRepository.findById(id);
     }
 
 }

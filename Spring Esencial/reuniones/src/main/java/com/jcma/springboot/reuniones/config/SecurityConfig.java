@@ -20,7 +20,7 @@ public class SecurityConfig {
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http
                 .authorizeHttpRequests(authorize -> authorize
-                        .requestMatchers("/api/*").hasRole("API_USER")
+                        .requestMatchers("/api/*", "/api/rest/**").hasRole("API_USER")
                         .anyRequest().authenticated()
                 )
                 .formLogin(form -> form

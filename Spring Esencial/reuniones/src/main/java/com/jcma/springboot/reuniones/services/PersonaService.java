@@ -5,6 +5,7 @@ import com.jcma.springboot.reuniones.models.Persona;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class PersonaService {
@@ -17,6 +18,10 @@ public class PersonaService {
 
     public List<Persona> getAllPersonas(){
         return iPersonaRepository.findAll();
+    }
+
+    public Optional<Persona> getById(Long id){
+        return iPersonaRepository.findById(id);
     }
 
 }
