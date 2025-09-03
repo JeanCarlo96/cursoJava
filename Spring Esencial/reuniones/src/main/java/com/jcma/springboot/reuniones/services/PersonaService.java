@@ -24,4 +24,8 @@ public class PersonaService {
         return iPersonaRepository.findById(id);
     }
 
+    public Persona addPersona(Persona persona){
+        return iPersonaRepository.save(persona);
+    }
+
 }
