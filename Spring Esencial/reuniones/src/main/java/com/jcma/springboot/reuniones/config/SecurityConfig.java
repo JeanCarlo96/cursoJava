@@ -19,12 +19,22 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http
-                .authorizeHttpRequests(authorize -> authorize
-                        .requestMatchers("/swagger-ui/**", "/v3/api-docs/**", "/v3/api-docs/**").permitAll()
+                .csrf(csrf -> csrf.disable()) // Swagger suele dar problemas con CSRF habilitado
+                .authorizeHttpRequests(auth -> auth
+                        // 👉 Endpoints de Swagger sin login
                         .requestMatchers(
-                                "/api/*",
-                                "/api/rest/**"
-                        ).hasRole("API_USER")
+                                "/swagger-ui/**",
+                                "/swagger-ui.html",
+                                "/v3/api-docs/**",
+                                "/v3/api-docs.yaml",
+                                "/swagger-resources/**",
+                                "/webjars/**"
+                        ).permitAll()
+
+                        // 👉 Tus APIs protegidas
+                        .requestMatchers("/api/*", "/api/rest/**").hasRole("API_USER")
+
+                        // 👉 El resto requiere autenticación
                         .anyRequest().authenticated()
                 )
                 .formLogin(form -> form
@@ -40,9 +50,11 @@ public class SecurityConfig {
         UserDetails usuario1 = User.builder().username("granJefe")
                 .password(passwordEncoder().encode("ssshhh"))
                 .roles("USER", "API_USER").build();
+
         UserDetails usuario2 = User.builder().username("currito")
                 .password(passwordEncoder().encode("pasapasa"))
                 .roles("USER").build();
+
         return new InMemoryUserDetailsManager(usuario1, usuario2);
     }
 
@@ -50,5 +62,4 @@ public class SecurityConfig {
     public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
     }
-
 }

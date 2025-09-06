@@ -14,7 +14,6 @@ spring:
     username: admin
     password: admin
     driver-class-name: com.mysql.cj.jdbc.Driver
-
   jpa:
     hibernate:
       ddl-auto: create
@@ -23,6 +22,10 @@ spring:
       hibernate:
         dialect: org.hibernate.dialect.MySQL8Dialect
     defer-datasource-initialization: true
+  sql:
+    init:
+      mode: always
+      continue-on-error: true
 
   data:
     rest:
@@ -38,6 +41,7 @@ management:
       roles: "USER"
       show-details: "when_authorized"
 springdoc:
+  show-login-endpoint: true
   api-docs:
     path: /v3/api-docs
   swagger-ui:
