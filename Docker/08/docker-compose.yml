@@ -1,0 +1,29 @@
+services:
+  node-app:
+    restart: always
+    build: .
+    ports:
+    - "3000:3000"
+    depends_on:
+    - mysql
+    environment:
+      - MYSQL_HOST=mysql
+      - MYSQL_USER=root
+      - MYSQL_PASSWORD=123Queso.
+      - MYSQL_DATABASE=tienda
+      - MYSQL_PORT=3309
+
+  mysql:
+    restart: always
+    image: mysql/mysql-server
+    ports:
+      - "3309:3306"
+    volumes:
+      - db-data:/var/lib/mysql
+    environment:
+      MYSQL_ROOT_PASSWORD: 123Queso.
+      MYSQL_DATABASE: tienda
+      MYSQL_ROOT_HOST: '%'
+  
+volumes:
+  db-data:

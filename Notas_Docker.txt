@@ -1,0 +1,286 @@
+* Ejecutar un contenedor Docker a partir de una imagen
+-d Permite ejecutar en segundo plano
+-p Permite asignar los puertos, primero puerto de la máquina, segundo puerto del contenedor
+--name Permite colocar el nombre del contenedor
+docker run -d -p 8088:80 --name welcome-to-docker docker/welcome-to-docker
+
+* Ayuda sobre docker y sus sub comandos
+docker help
+
+* Si no tengo en local la imagen la descargará
+docker run ubuntu
+
+* Información de los contenedores que se están ejecutando
+docker ps
+
+* Muestra todos los contenedor
+docker ps -a
+
+* Ver las imagenes que tenemos
+docker images
+
+* Para descargar una imagen en específico, como mysql
+docker pull mysql
+
+* Comando para ejecutar comandos dentro de un contenedor
+-it Comando debe ejecutarse en una sesion interactiva
+sh Comando que se ejecuta dentro del contenedor
+docker exec -it welcome-to-docker sh
+   Dentro del contenedor ejecutamos
+   cd /usr/share/nginx/html
+   vi mipagina.html
+   Dentro agregamos una pagina html que querramos
+Nota: Podemos ver la página si nos vamos al puerto del contenedor seguido de /mipagina.html
+   exit Para salir de la línea de comandos del contenedor
+Nota: Los cambios realizados dentro del contenedor puede perderse si el contenedor se detiene o elimina
+
+* Primero busca si tenemos localmente la imagen redis, luego ejecuta un nuevo contenedor el cual, tanto
+puerto de la máquina como del contenedor será el 6379
+docker run --name mi_redis -p 6379:6379 redis
+-d nos indica que se ejecutará en modo detach (segundo plano)
+docker run --name mi_redis -p 6379:6379 - d redis
+nos devuelve el id del cotenedor.
+
+* Docker nombra automaticamente un contenedor
+docker run --name micontenedor hello-world
+
+* Renombrar un contenedor
+docker rename micontenedor micontenedor_nuevo
+
+* Listar todos los contenedores
+docker container ls
+docker container list
+
+* Filtros en el listado de contenedores
+docker container ls -n 1   -> Devuelve máximo un resultado
+docker container ls -q     -> Esto devuelve solo los ids de los contenedores
+docker container ls -f "status=exited"   -> Muestra los contenedores que tienen el estado exited
+docker container ls -a -f "name=welcome"   -> Devuelve los contenedores cuyo nombre contiene welcome
+docker container ls -f "ancestor=docker/welcome-to-docker"   -> Devuelve el contenedor que usó la imagen de base welcome-to-docker
+
+* Detener un contenedor, puede ser por el nombre o por el id
+docker stop welcome-to-docker
+docker stop 0d0c9e362fc3
+docker stop -t 120 welcome-to-docker   -> Parar el contenedor luego de 120
+
+* Poner un contenedor en pausa para liberar CPU, no memoria
+docker pause 0d0c9e362fc3
+
+* Eliminar contenedores
+docker rm 562469219bf9
+docker container prune   -> Elimina todos los contenedores que no están en uso
+
+* Revisar logs
+docker logs welcome-to-docker
+docker logs -f welcome-to-docker   -> Ver los logs en tiempo real
+
+* Mapeo de puerto local 3308, nombre del contenedor mysql-container,contraseña my-secret-pw
+se permite ejecucion en cualquier host con % y se indica al final la imagen
+docker run -d -p 3308:3306 --name mysql-container -e MYSQL_ROOT_PASSWORD=my-secret-pw -e MYSQL_ROOT_HOST=% mysql/mysql-server
+
+* Se crea un contenedor en el mismo puerto tanto local como del contenedor sobre la imagen redis
+docker run -p 6379:6379 -d redis
+
+* Copiar archivos, hacia y desde los contenedores
+docker run -p 8080:80 -d docker/welcome-to-docker   -> Se crea un contenedor que contiene un servidor web ligero nginx en el puerto 8080
+docker exec -it nice_chatelet sh -> Permite ejecutar comandos dentro del contenedor con una interfaz de terminal simulada y el nombre del contenedor
+                                    con sh para ejecutar dentro del contenedor
+cd /usr/share/nginx/html   -> Nos vamos a esa ruta donde debemos copiar el elemento
+exit   -> Salimos del contenedor
+docker cp C:/Users/jmarchesini/Downloads/Varios/pagina.html nice_chatelet:/usr/share/nginx/html   -> copia los archivos locales a una ruta en el
+                                                                                                  contenedor
+docker cp nice_chatelet:/usr/share/nginx/html C:/Users/jmarchesini/Downloads/Varios   -> copiar todos los arcivos de la ruta del contenedor y 
+                                                                                         pegarlos en la maquina local
+
+* Buscar imágenes
+docker search node   -> Buscará imagenes del lenguaje node
+docker search --filter stars=1000 node   -> Buscará imágenes que tengan mil o más estrellas
+docker search --filter stars=1000 --filter is-official=true node
+
+* Nos devuelve las imágenes que tenemos en local
+docker image ls
+docker images
+
+* Eliminar una imagen
+docker image rm node   -> Elimina la imagen de node
+
+* Docker file
+- No tiene ninguna extensión, se lo llama simplemente como: Dockerfile
+- FROM: Utiliza una imagen base
+- COPY: Copiar directorios en local, dentro de un directorio de nginx
+        En nuestro ejemplo indicamos con . que copie todo y luego lo pegue en la ruta indicada
+- EXPOSE: Expone el puerto para que pueda ser accedido desde el navegador (Puerto interno del contenedor)
+
+FROM nginx:alpine
+
+COPY . /usr/share/nginx/html
+
+EXPOSE 80
+
+* Construir una imagen
+docker build .   -> El punto indica a Docker que busque el archivo Dockerfile en el repositorio actual
+docker build -t mi-aplicacion-ngnix:v1.0 .   -> Crea la imagen con nombre y versión
+
+* Nombrar o Renombrar
+docker tag ee880294824c app-enginx
+
+* Crear contenedor a partir de una imagen
+docker run -p 8080:80 -d mi-aplicacion-nginx:v1.0   -> En -p el segundo puerto indica el puesto en el archivo Dockerfile
+
+* Ejemplo 04: Dos archivos, app.js y server.js, en el package.json se indica que inicie con app.js, eso lo hará con el comando normal
+docker run -p 3000:3000 -d node-cmd-app
+Ahora vamos a indicar que inicie con el server.js
+docker run -p 3000:3000 -d node-cmd-app node server.js
+
+* Otro ejemplo con Dockerfile
+WORKDIR: Indica el directorio de trabajo dentro del contenedor
+RUN: Permite ejecutar ciertas operaciones sobre el contenedor
+
+FROM nginx:alpine
+
+WORKDIR /usr/share/nginx/html
+
+COPY index.html .   -> Donde se copiará es donde se indica en el WORKDIR
+
+COPY css.zip .
+
+RUN unzip css.zip && rm css.zip
+
+EXPOSE 80
+
+* Ejecutar la imagen previamente creada
+docker run -p 8081:80 -d mi-app-zip
+
+* Otro ejemplo con Dockerfile
+ENV: Permite colocar variables de ambiente
+EXPOSE: Permite indicar que el puerto a utilizar es el definido en ENV
+CMD: Define comando que se ejecutará cuando el contenedor inicie
+
+FROM node:18.20-alpine
+
+WORKDIR /app
+
+COPY . .
+
+RUN npm install
+
+ENV PORT=3000
+
+EXPOSE $PORT
+
+CMD ["node", "app.js"]
+
+docker build -t app-node .   -> Creamos la imagen con el nombre de app-node
+
+* CMD es ideal para proporcionar comandos o parámetros por defecto
+* ENTRY POINT es mejor para contenedores que deben definir un comando que siempre debe ejecutarse
+
+Ejemplo 04: Tenemos dos archivos, app.js y server.js, en el documento package.js se indica que inicia con app.js,
+en el Dockerfile ocupamos CMD 
+docker run -p 3000:3000 -d node-cmd-app   -> Así mostrará en el puerto 3000 el mensaje Hola Mundo
+docker run -p 3000:3000 -d node-cmd-app node server.js   -> Así mostrará Hola desde Server, osea se cambio su arranque
+
+Ejemplo 04: Misma configuración del Ejemplo 04, pero en el Dockerfile ocupamos ENTRYPOINT
+docker run -p 3000:3000 -d node-entry-point-app   -> Muestra en el puerto 3000 Hola Mundo
+docker run -p 3000:3000 --entrypoint "node" node-entry-point-app server.js   -> Cambiamos el valor establecido del entry point de app.js a server.js
+
+* Muestra una descripción general de la imagen (Debemos tener cuenta en Docker Hub)
+docker scout quickview node-application
+
+* Me da recomendaciones sobre otras versiones que podemos usar para reducir las vulnerabilidades
+docker scout recommendations node-application
+
+* Comando que me permite crear una nueva imagen a partir de un contendor (Útil para ocaciones en las que se ha modifiacado algo en el contenedor)
+docker commit sweet_sinoussi imagen-node-app   -> Se crea una nueva imagen con el nombre: imagen-node-app
+
+* Salvar esa imagen en neustro local
+docker save -o imagen-node-app.tar imagen-node-app   -> Se crea un archivo imagen-node-app.tar en la ruta donde esté abierto el CMD
+
+* Cargar la imagen descargada nuevamente en Docker
+docker load -i imagen-node-app.tar   -> Podemos ver como aparece si listamos las imágenes
+
+* Nos permite ver las capas de una imagen, si dos imágenes ocupan las mismas capas docker reutiliza esas capaz para reducir espacio,
+si una vez se creó una capa, esta no se puede modificar, toca crear una nueva
+docker history imagen-node-app  -> Cada comando dentro del Dockerfile representa una capa
+
+* El ejercicio 07 en su archivo Dockerfile, tiene instrucciones que eliminan archivos temporales, lo que hace que sea más liviana la imagen en comparación
+de una creada sin esos comandos indicados
+docker build -t app-optimizada .
+
+* Para iniciar sesion en docker hub
+docker login
+
+* Etiquetamos nuestra imagen, nombre de la imagen que vamos a subir, nombre de usuario de docker hub / nombre repositorio : version o tag
+docker tag imagen-node-app jeancarlo96/aplicacion-node:v1.0   -> Crea una nueva imagen, jeancarlo96/aplicacion-node
+
+* Subir la imagen a docker hub, la etiqueta es la misma que colocamos en el paso anterior
+docker push jeancarlo96/aplicacion-node:v1.0
+
+* Comprobar que la imagen esté subida
+docker search jeancarlo96/aplicacion-node  -> Van a salir varios, entre esos el que nosotros subimos
+
+* Consultas en el API de Docker HUB
+https://hub.docker.com/v2/users/jeancarlo96/   -> Información del usuario
+https://hub.docker.com/v2/repositories/jeancarlo96/   -> Información del repositorio
+
+* Crear volumenes
+--mount
+src: Indica el nombre del volumen
+dst: Indica donde se monta el volumen (Dentro del contenedor)
+docker run -p 3309:3306 --name contenedor-mysql -e MYSQL_ROOT_PASSWORD=123Queso. -e MYSQL_ROOT_HOST=% --mount src=mysql-volumen,dst=/var/lib/mysql-d mysql/mysql-server
+
+* Eliminar volumenes
+docker volume rm mysql-volumen
+docker volume prune -a   -> Se van a eliminar todos los volúmenes no utilizados, y no solamente aquellos anónimos gracias al -a
+
+* Crear un nuevo columen
+docker volume create mysq-test-volumen
+
+* Listado de volumenes
+docker volume ls
+
+* Más infirmación de volumenes
+docker volume inspect mysq-test-volumen
+
+* Montar un volumen que ya ha sido creado en un contenedor, para eso ocupamos -v, indicamos el volumen : el nombre del directorio dentro del contenedor
+docker run -d -p 3309:3306 --name mysql-test-contenedor -v mysq-test-volumen:/var/lib/mysql -d mysql/mysql-server
+
+* Docker compose: Permite definir y ejecutar aplicaciones con múltiples contenedores (Ejercicio 08)
+restart: Politica de reinicio del contenedor, en el ejercicio always (siempre)
+build: Ejecuta un contenedor guiandose en Dockerfile en este caso al mismo nivel con "."
+depends_on: Para indicar que se debe levantar primero, en nuestro caso mysql
+
+* Creo una imagen de nombre mi-proyecto-node-app, ejecutó un contenedor de nombre mi-proyecto, dentro tenemos dos contendores corriendo:
+mysql y node-app
+docker-compose -p mi-proyecto up -d
+
+* Modo Swarm, es una característica avanzada para administrar un grupo de demonios docker, para saber si está habilitada:
+docker system info | findstr "Swarm"
+
+* Activar el modo swarm
+docker swarm init   -> Docker swarm trabaja con nodos para ejecutar aplicaciones, los nodos son ordenadores individuales dentro del cluster y un cluster
+                       es un grupo de nodos. Los nodos puedes ser manager para tomar decisiones sobre ejecución de aplicaciones o nodo workers que siguen
+                       las instrucciones de los nodos manager.
+
+* Ejemplo en Swarm (Ejemplo 09)
+Primero debemos construir la imagen del dockerfile
+docker build -t node-app .
+
+Vamos hacer un deploy sobre docker swarm
+-c luego indico el archivo de docker compose
+luego el nombre del servicio swarm (mi-aplicacion-swarm)
+docker stack deploy -c docker-compose.yml mi-aplicacion-swarm --detach=false   -> Se empiezan a crear servicios, los servicios son aplicaciones que quieres ejecutar
+
+* Para listar todos los servicios
+docker service ls
+
+* Listar los nodos
+docker node ls
+
+* Replicacion de servicios en 3
+docker service scale mi-aplicacion-swarm_node-app=3
+
+* Para eliminar los servicios y el network
+docker stack rm mi-aplicacion-swarm
+
+
