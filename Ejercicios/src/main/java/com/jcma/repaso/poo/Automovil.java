@@ -1,0 +1,204 @@
+package com.jcma.repaso.poo;
+
+public class Automovil implements Comparable<Automovil>{
+
+    private String fabricante;
+    private String modelo;
+    private Color color = Color.AZUL;
+    private Motor motor;
+    private Tanque tanque;
+    private Persona conductor;
+    Rueda[] ruedas;
+    private static String colorPatente = "Naranja";
+    private int id;
+    private static int ultimoId;
+    private TipoAutomovil tipo;
+    private int indiceRuedas;
+
+    public static final Integer VELOCIDAD_MAXIMA_CARRETERA = 120;
+    public static final int VELOCIDAD_MAXIMA_CIUDAD = 60;
+
+    public static final String COLOR_ROJO = "Rojo";
+    public static final String COLOR_AMARILLO = "Amarrillo";
+
+
+    public Automovil(){
+        this.id = ++ultimoId;
+        this.ruedas = new Rueda[5];
+    }
+
+    public Automovil(String fabricante, String modelo) {
+        this();
+        this.fabricante = fabricante;
+        this.modelo = modelo;
+    }
+
+    public Automovil(String fabricante, String modelo, Color color) {
+        this(fabricante, modelo);
+        this.color = color;
+    }
+
+    public Automovil(String fabricante, String modelo, Color color, Motor motor) {
+        this(fabricante, modelo, color);
+        this.motor = motor;
+    }
+
+    public Automovil(String fabricante, String modelo, Color color, Motor motor, Tanque tanque) {
+        this(fabricante, modelo, color, motor);
+        this.tanque = tanque;
+    }
+
+    public Automovil(String fabricante, String modelo, Color color, Motor motor, Tanque tanque, Persona conductor, Rueda[] ruedas) {
+        this(fabricante, modelo, color, motor, tanque);
+        this.conductor = conductor;
+        this.ruedas = ruedas;
+    }
+
+    public String detalle(){
+        StringBuilder sb = new StringBuilder();
+        sb.append("auto.fabricante: " + this.fabricante);
+        sb.append("\nauto.modelo: " + this.modelo);
+        sb.append("\nauto.color: " + this.color);
+        sb.append("\nauto.patente: " + colorPatente);
+        sb.append("\nauto.cilindrada: " + motor.getCilindrada());
+        sb.append("\nauto.id: " + this.id);
+        sb.append("\nauto.tipo: " + this.tipo);
+        return sb.toString();
+    }
+
+    public String acelerar(int rpm) {
+        return "el auto " + this.fabricante + " acelerando a " + rpm + " rpm";
+    }
+
+    public String frenar() {
+        return this.fabricante + " " + this.modelo + " frenando!";
+    }
+
+    public String acelerarFrenar(int rpm){
+        String acelerar = this.acelerar(rpm);
+        String frenar = this.frenar();
+        return acelerar + "\n" + frenar;
+    }
+
+    public float calcularConsumo(int km, float porcentajeBencina){
+        return km/(tanque.getCapacidad()*porcentajeBencina);
+    }
+
+    public float calcularConsumo(int km, int porcentajeBencina){
+        return km/(tanque.getCapacidad()*(porcentajeBencina/100f));
+    }
+
+    public String getFabricante() {
+        return fabricante;
+    }
+
+    public void setFabricante(String fabricante) {
+        this.fabricante = fabricante;
+    }
+
+    public String getModelo() {
+        return modelo;
+    }
+
+    public void setModelo(String modelo) {
+        this.modelo = modelo;
+    }
+
+    public Color getColor() {
+        return color;
+    }
+
+    public void setColor(Color color) {
+        this.color = color;
+    }
+
+    public TipoAutomovil getTipo() {
+        return tipo;
+    }
+
+    public void setTipo(TipoAutomovil tipo) {
+        this.tipo = tipo;
+    }
+
+
+
+    public Motor getMotor() {
+        return motor;
+    }
+
+    public void setMotor(Motor motor) {
+        this.motor = motor;
+    }
+
+    public Tanque getTanque() {
+        return tanque;
+    }
+
+    public void setTanque(Tanque tanque) {
+        this.tanque = tanque;
+    }
+
+    public Persona getConductor() {
+        return conductor;
+    }
+
+    public void setConductor(Persona conductor) {
+        this.conductor = conductor;
+    }
+
+    public Rueda[] getRuedas() {
+        return ruedas;
+    }
+
+    public void setRuedas(Rueda[] ruedas) {
+        this.ruedas = ruedas;
+    }
+
+    public Automovil addRueda(Rueda rueda){
+        if(indiceRuedas < this.ruedas.length){
+            this.ruedas[indiceRuedas++] = rueda;
+        }
+        return this;
+    }
+
+    @Override
+    public String toString() {
+        return "Automovil{" +
+                "fabricante='" + fabricante + '\'' +
+                ", modelo='" + modelo + '\'' +
+                ", color='" + color + '\'' +
+                ", cilindrada=" + motor.getCilindrada() +
+                ", capacidadTanque=" + tanque.getCapacidad() +
+                ", tipo=" + tipo +
+                '}';
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if(this == obj){
+            return true;
+        }
+
+        if(!(obj instanceof Automovil)){
+            return false;
+        }
+        Automovil a = (Automovil) obj;
+        return (this.fabricante != null
+                && this.modelo != null
+                && this.fabricante.equals(a.getFabricante())
+                && this.modelo.equals(a.getModelo()));
+    }
+
+    public static String getColorPatente(){
+        return colorPatente;
+    }
+
+    public static void setColorPatente(String colorPatente){
+        Automovil.colorPatente = colorPatente;
+    }
+
+    @Override
+    public int compareTo(Automovil a) {
+        return modelo.compareTo(a.modelo);
+    }
+}
